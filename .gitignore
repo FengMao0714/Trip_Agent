@@ -1,0 +1,101 @@
+# ============================================================
+# .gitignore — Python + Node.js 混合项目
+# 项目：Trip Planner FM（智能 Agent 旅游助手）
+# ============================================================
+
+# ===== Python / 后端 =====
+
+# 虚拟环境
+.venv/
+venv/
+env/
+.python-version
+
+# 字节码
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+
+# uv
+.uv/
+
+# 分发/构建
+*.egg-info/
+*.egg
+dist/
+build/
+*.whl
+
+# 测试/覆盖率
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# PyTorch / 模型文件（Embedding 模型不提交）
+*.pt
+*.pth
+*.bin
+*.safetensors
+models/
+
+# ===== Node.js / 前端 =====
+
+node_modules/
+.next/
+out/
+.turbo/
+.vercel/
+
+# pnpm
+.pnpm-store/
+
+# 构建产物
+frontend/.next/
+frontend/out/
+
+# ===== 通用 =====
+
+# 环境变量（绝对不提交！）
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.production
+
+# IDE
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 日志
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Docker 数据卷（本地持久化）
+pgdata/
+redisdata/
+
+# 操作系统
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# Gemini / AI 工具
+.gemini/

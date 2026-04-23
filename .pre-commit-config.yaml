@@ -1,0 +1,86 @@
+# ============================================================
+# pre-commit 配置 — Trip Planner FM
+# 安装：pip install pre-commit && pre-commit install
+# 手动运行：pre-commit run --all-files
+# ============================================================
+
+repos:
+  # ---- Python: Ruff (lint + format) ----
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.11.0
+    hooks:
+      - id: ruff
+        name: ruff-check
+        args: [--fix, --exit-non-zero-on-fix]
+        files: ^backend/
+      - id: ruff-format
+        name: ruff-format
+        files: ^backend/
+
+  # ---- Python: mypy 类型检查 ----
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.14.0
+    hooks:
+      - id: mypy
+        name: mypy-typecheck
+        files: ^backend/app/
+        args: [--ignore-missing-imports, --no-strict-optional]
+        additional_dependencies:
+          - fastapi>=0.136.0
+          - pydantic>=2.0
+          - types-redis
+
+  # ---- TypeScript: ESLint ----
+  - repo: local
+    hooks:
+      - id: eslint
+        name: eslint
+        entry: bash -c 'cd frontend && pnpm lint'
+        language: system
+        files: ^frontend/src/.*\.(ts|tsx)$
+        pass_filenames: false
+
+      # ---- TypeScript: Prettier ----
+      - id: prettier
+        name: prettier
+        entry: bash -c 'cd frontend && pnpm exec prettier --check "src/**/*.{ts,tsx,css}"'
+        language: system
+        files: ^frontend/src/.*\.(ts|tsx|css)$
+        pass_filenames: false
+
+      # ---- TypeScript: tsc 类型检查 ----
+      - id: tsc
+        name: tsc-typecheck
+        entry: bash -c 'cd frontend && pnpm tsc --noEmit'
+        language: system
+        files: ^frontend/src/.*\.(ts|tsx)$
+        pass_filenames: false
+
+  # ---- 通用：文件格式 ----
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-added-large-files
+        args: [--maxkb=1000]
+      - id: no-commit-to-branch
+        args: [--branch, main]
+
+  # ---- Commit Message 格式检查 ----
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v4.0.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+        args:
+          - feat
+          - fix
+          - docs
+          - refactor
+          - test
+          - chore
+          - style

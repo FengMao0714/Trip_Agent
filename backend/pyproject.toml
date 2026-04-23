@@ -1,0 +1,56 @@
+# ============================================================
+# Ruff 配置 — Python 后端
+# ============================================================
+
+[tool.ruff]
+target-version = "py311"
+line-length = 88
+src = ["app"]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "N",    # pep8-naming
+    "UP",   # pyupgrade (自动升级到新语法)
+    "B",    # flake8-bugbear
+    "A",    # flake8-builtins
+    "T20",  # flake8-print (禁止 print)
+    "SIM",  # flake8-simplify
+    "RUF",  # ruff 专属规则
+]
+ignore = [
+    "E501",   # 行宽由 formatter 管理
+    "B008",   # FastAPI Depends() 需要在函数参数中调用
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+# ============================================================
+# pytest 配置
+# ============================================================
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+python_files = "test_*.py"
+python_functions = "test_*"
+
+# ============================================================
+# mypy 配置
+# ============================================================
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+check_untyped_defs = true
+disallow_untyped_defs = false

@@ -1,0 +1,164 @@
+# ============================================================
+# GitHub Actions CI — Trip Planner FM
+# 触发：PR 到 main 分支时自动运行 lint + test
+# ============================================================
+
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# 同一 PR 的新 push 自动取消旧运行
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ============================================================
+  # Job 1: 检查 Commit Message 格式（Conventional Commits）
+  # ============================================================
+  commit-lint:
+    name: Commit Message Check
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install commitlint
+        run: npm install -g @commitlint/cli @commitlint/config-conventional
+
+      - name: Create commitlint config
+        run: |
+          echo "module.exports = {
+            extends: ['@commitlint/config-conventional'],
+            rules: {
+              'scope-enum': [2, 'always', [
+                'agent', 'api', 'tools', 'rag', 'frontend',
+                'chat', 'map', 'itinerary', 'docker', 'sse'
+              ]],
+              'scope-empty': [1, 'never'],
+            }
+          };" > commitlint.config.js
+
+      - name: Lint commits
+        run: |
+          commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }}
+
+  # ============================================================
+  # Job 2: Python 后端 — lint + typecheck + test
+  # ============================================================
+  backend:
+    name: Backend (Python)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_DB: trip_planner_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: test_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.7.x"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Ruff lint
+        run: uv run ruff check app/
+
+      - name: Ruff format check
+        run: uv run ruff format --check app/
+
+      - name: mypy type check
+        run: uv run mypy app/ --ignore-missing-imports
+        continue-on-error: true
+
+      - name: Run tests
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_DB: trip_planner_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: test_password
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+          DEEPSEEK_API_KEY: sk-test-key
+          DEEPSEEK_BASE_URL: https://api.deepseek.com
+          AMAP_API_KEY: test-amap-key
+        run: uv run pytest tests/ -v --tb=short
+
+  # ============================================================
+  # Job 3: Next.js 前端 — lint + typecheck + build
+  # ============================================================
+  frontend:
+    name: Frontend (Next.js)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: ESLint
+        run: pnpm lint
+
+      - name: TypeScript type check
+        run: pnpm tsc --noEmit
+
+      - name: Build check
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:8000
+          NEXT_PUBLIC_AMAP_KEY: test-key
+          NEXT_PUBLIC_AMAP_SECRET: test-secret
+        run: pnpm build
