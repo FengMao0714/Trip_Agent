@@ -78,11 +78,30 @@
 ```
 Trip_planner_FM/
 │
+├── .agents/                          # ===== AI 编码规范 ====
+│   ├── AGENTS.md                    # 通用编码规范
+│   └── rules/
+│       ├── backend.rules.md         # Python 后端规则（glob: *.py）
+│       └── frontend.rules.md        # Next.js 前端规则（glob: *.{ts,tsx}）
+│
+├── .github/
+│   └── workflows/
+│       └── ci.yml                   # GitHub Actions CI（lint + test）
+│
+├── Docs/                             # ===== 项目文档 =====
+│   ├── PRD.md                       # 产品需求文档
+│   ├── ARCHITECTURE.md              # 架构设计文档（本文档）
+│   ├── TECH-STACK.md                # 技术栈锁定清单
+│   ├── PROJECT-SCOPE.md             # 项目范围与约束
+│   ├── STATUS.md                    # 项目状态跟踪
+│   ├── BRANCH-STRATEGY.md          # 分支保护策略
+│   └── frontend-design.md          # 前端设计文档
+│
 ├── backend/                          # ===== Python 后端 =====
-│   ├── pyproject.toml                # uv 项目配置 + 依赖声明
+│   ├── pyproject.toml                # uv 项目配置 + 依赖声明 + 工具配置
 │   ├── uv.lock                       # 锁定精确版本
 │   │
-│   ├── app/
+│   ├── app/                         # 应用源码（Python 包）
 │   │   ├── __init__.py
 │   │   ├── main.py                   # FastAPI 应用入口，挂载路由
 │   │   ├── config.py                 # 环境变量 / Pydantic Settings
@@ -125,10 +144,13 @@ Trip_planner_FM/
 │   │   │   ├── session.py            # 会话管理（Redis）
 │   │   │   └── cache.py              # 缓存服务（Redis）
 │   │   │
-│   │   └── db/                       # 数据库
+│   │   └── db/                       # 数据库连接（Python 包）
 │   │       ├── __init__.py
 │   │       ├── connection.py         # 数据库连接池
 │   │       └── migrations/           # 数据库迁移脚本
+│   │
+│   ├── db/                           # 数据库初始化（非 Python 包）
+│   │   └── init.sql                  # Docker 首次启动时执行的建表脚本
 │   │
 │   ├── data/                         # 知识库原始数据
 │   │   ├── beijing.json
@@ -161,22 +183,21 @@ Trip_planner_FM/
 │   │   │   ├── chat/                 # 对话组件
 │   │   │   ├── itinerary/            # 行程组件
 │   │   │   ├── map/                  # 地图组件
-│   │   │   └── layout/               # 布局组件
+│   │   │   ├── layout/               # 布局组件
+│   │   │   └── landing/              # 落地页组件
 │   │   │
 │   │   ├── hooks/                    # useChat, useItinerary, useAMap
 │   │   ├── store/                    # Zustand store
 │   │   ├── lib/                      # API 封装、SSE、工具函数
-│   │   └── types/                    # TypeScript 类型
+│   │   ├── types/                    # TypeScript 类型
+│   │   └── mock/                     # Mock 数据（前端独立开发用）
 │   │
 │   └── Dockerfile
 │
-├── docker-compose.yml                # 服务编排
+├── .gitignore                        # Git 忽略规则
 ├── .env.example                      # 环境变量模板
-├── PRD.md
-├── TECH-STACK.md
-├── PROJECT-SCOPE.md
-├── frontend-design.md
-├── ARCHITECTURE.md                   # 本文档
+├── .pre-commit-config.yaml           # pre-commit 钩子配置
+├── docker-compose.yml                # 服务编排（PG + Redis + 后端 + 前端）
 └── README.md
 ```
 
