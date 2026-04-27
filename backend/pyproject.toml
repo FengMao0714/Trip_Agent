@@ -12,6 +12,7 @@ dependencies = [
     "sqlalchemy>=2.0",
     "asyncpg",
     "pgvector>=0.3.0,<0.4",
+    "pydantic-settings",
     "redis>=5.0",
     "sentence-transformers>=3.0",
     "httpx",
