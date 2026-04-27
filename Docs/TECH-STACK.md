@@ -1,6 +1,6 @@
 # 技术栈锁定清单：智能 Agent 旅游助手
 
-> **版本**：v1.0 | **日期**：2026-04-22 | **状态**：已锁定
+> **版本**：v1.1 | **日期**：2026-04-27 | **状态**：已锁定
 
 ---
 
@@ -18,10 +18,10 @@
 
 | 组件 | 选型 | 锁定版本 | 说明 |
 |------|------|----------|------|
-| **Agent 编排** | LangGraph | `0.4.x` | 状态机管理，支持 ReAct 循环、条件分支、检查点 |
-| **基础组件** | LangChain Core | `0.3.x` | 提供 ChatModel、Tool、PromptTemplate 等基础抽象 |
-| **MCP 适配** | langchain-mcp-adapters | `0.2.2` | MCP 工具转 LangChain Tool 的轻量包装器 |
-| **OpenAI 兼容** | langchain-openai | `0.3.x` | 通过 OpenAI 兼容接口调用 DeepSeek |
+| **Agent 编排** | LangGraph | `1.1.x` | 状态机管理，支持 ReAct 循环、条件分支、检查点 |
+| **基础组件** | LangChain Core | `1.x` | 提供 ChatModel、Tool、PromptTemplate 等基础抽象 |
+| **MCP 适配** | langchain-mcp-adapters | `0.2.2` | MCP 工具转 LangChain Tool 的轻量包装器（要求 langchain-core>=1.0.0） |
+| **OpenAI 兼容** | langchain-openai | `1.x` | 通过 OpenAI 兼容接口调用 DeepSeek |
 
 ### 1.3 LLM 接入
 
@@ -212,9 +212,9 @@ pnpm add zustand react-markdown @amap/amap-jsapi-loader
 ```
 Python 3.11+
   ├── FastAPI 0.136.0 ─── Pydantic 2.x ✅
-  ├── LangGraph 0.4.x
-  │     └── LangChain Core 0.3.x ✅
-  │     └── langchain-openai 0.3.x ✅
+  ├── LangGraph 1.1.x
+  │     └── LangChain Core 1.x ✅
+  │     └── langchain-openai 1.x ✅
   │     └── langchain-mcp-adapters 0.2.2 ✅
   ├── SQLAlchemy 2.0.x + asyncpg ✅
   ├── pgvector-python 0.3.x ── PostgreSQL 16 + pgvector 0.8.x ✅
@@ -238,7 +238,7 @@ Node.js 20 LTS
 
 | 风险项 | 严重程度 | 描述 | 缓解措施 |
 |--------|----------|------|----------|
-| **LangGraph 版本迭代快** | 中 | API 可能在小版本间变化 | 锁定 `0.4.x`，用 `uv.lock` 固定精确版本 |
+| **LangGraph 版本迭代快** | 中 | API 可能在小版本间变化 | 锁定 `1.1.x`，用 `uv.lock` 固定精确版本 |
 | **langchain-mcp-adapters 较新** | 中 | 社区案例少，遇到 Bug 难排查 | 准备直接 API 调用的降级方案 |
 | **sentence-transformers 依赖 PyTorch** | 低 | PyTorch 体积大（~2GB），Docker 镜像体积膨胀 | 使用 `torch` CPU-only 版本减小体积 |
 | **高德地图 SSR 不兼容** | 低 | 高德 JS SDK 依赖 `window` 对象 | 已确认用 `dynamic + ssr:false` 解决 |
@@ -315,8 +315,8 @@ services:
 │                        SSE                           │
 ├─────────────────────────────────────────────────────┤
 │                   后端 (FastAPI 0.136)                │
-│  LangGraph 0.4 (Agent 编排)                          │
-│  LangChain Core 0.3 (基础组件)                       │
+│  LangGraph 1.1 (Agent 编排)                          │
+│  LangChain Core 1.x (基础组件)                       │
 │  langchain-mcp-adapters 0.2 (MCP 工具适配)           │
 │  DeepSeek-V3 (LLM，OpenAI 兼容接口)                  │
 ├──────────────┬──────────────┬────────────────────────┤
