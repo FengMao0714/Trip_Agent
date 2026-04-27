@@ -8,6 +8,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.router import api_router
+from app.db.connection import close_db, init_db
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +17,9 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """Manage application startup and shutdown lifecycle."""
     logger.info("Starting Trip Planner backend", extra={"app": app.title})
+    await init_db()
     yield
+    await close_db()
     logger.info("Stopping Trip Planner backend", extra={"app": app.title})
 
 

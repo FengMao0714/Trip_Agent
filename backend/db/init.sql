@@ -5,6 +5,7 @@
 
 -- 启用 pgvector 扩展
 CREATE EXTENSION IF NOT EXISTS vector;
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- 旅游知识切片表
 CREATE TABLE IF NOT EXISTS knowledge_chunks (
